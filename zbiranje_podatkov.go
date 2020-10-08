@@ -107,6 +107,10 @@ func main() {
 				r := strings.ReplaceAll(match[4], " ", "")
 				result := r[2:len(r)-2]
 
+				if match[1] == "1." {
+					break
+				}
+
 				// Če pri mestu piše G zamenja z 1., S zamenja z 2. in B zamenja s 3.
 				switch match[1]{
 				case "G": fileCSV = append(fileCSV, disc, year, name, country, "1.", result)

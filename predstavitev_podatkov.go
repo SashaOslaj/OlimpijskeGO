@@ -7,9 +7,11 @@ import(
 	"log"
 )
 
+// Tekmovalec je ...
 type Tekmovalec struct {
 	ime string
 	drzava string
+	mesto string
 	rezultat string
 	disciplina string
 	olimpijske string
@@ -84,15 +86,30 @@ func readCSV(filename string) ([][]string, error) {
 
 func main() {
 
+	// Odpre in prebere CSV datoteko
 	lines, err := readCSV("rezultati.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	rezultati := make(map[string][]*Tekmovalec)
+
 	// For zanka po vrsticah v CSV datoteki
 	for _, line := range lines {
-		fmt.Println(line)
+
+		// Shrani Tekmovalca v spremenljivko tekm
+		var tekm *Tekmovalec = &Tekmovalec{line[2],line[3],line[4],line[5],line[0],line[1]}
+
+		// Preveri, ce je nek tekmovalec ze v slovarju, kjer so kluci imena tekmovalcev
+		if _, ok := rezultati[line[2]]; ok {
+			// Pri nekem kljucu doda tekmo v seznam
+			rezultati[line[2]] = append(rezultati[line[2]],tekm)
+		} else {
+			// V slovarju ustvari kljuc z imenom tekmovalca in prvo tekmo, ki jo najde v csv datoteki
+			rezultati[line[2]] = []*Tekmovalec{tekm}
+		}
 	}
+	//fmt.Println(rezultati)
 
 }
 
