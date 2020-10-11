@@ -8,6 +8,7 @@ import(
 	"sort"
 	"strconv"
 	"strings"
+	"github.com/wcharczuk/go-chart"
 )
 
 // Tekmovalec je ...
@@ -165,6 +166,8 @@ func main() {
 		}
 	}
 
+	var vrednosti []chart.Value
+
 	for key, value := range slovarDrzav {
 
 		// key = kratica drzave, value = stevilo tekmovalcev iz te drzave
@@ -172,6 +175,7 @@ func main() {
 		d,_ := drzaveFile.WriteString("Iz drzave s kratico " + key + " je bilo " + strconv.FormatInt(v, 10) + " tekmovalcev. \n" )
 		// printanje d, da se program zazene
 		fmt.Println(d)
+		vrednosti = append(vrednosti, chart.Value{Label: key, Value: float64(value)})
 	}
 
 	for key, value := range slovarDisciplinPrvaMesta {
@@ -238,7 +242,7 @@ func main() {
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + "\n")
-					fmt.Println(disc, value)
+					fmt.Println(disc)
 				}
 			} else {
 				// Ce so bli podatki samo za eno mesto
@@ -247,13 +251,35 @@ func main() {
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + " " + value[0][0] + " " + value[0][1] + "\n")
-					fmt.Println(disc, value)
+					fmt.Println(disc)
 				}
 			}
 		}
 		// Zaprla datoteko
 		disciplineFile.Close()
 	}
+
+	// Risanje bar chart za 20 nakljucnih drzav
+	graph := chart.BarChart{
+		Title: "Tekmovalci po drzavah",
+		Background : chart.Style{
+			Padding: chart.Box {
+				Top: 50,
+				Bottom: 20,
+			},
+		},
+		Height: 700,
+		BarWidth: 20,
+		Bars: vrednosti[:20],
+		YAxis: chart.YAxis{
+			AxisType: chart.YAxisPrimary,
+	},
+	}
+
+	f, _ := os.Create("Tekmovalci_po_drzavah.png")
+	defer f.Close()
+	graph.Render(chart.PNG, f)
+
 	// Zaprla datoteki
 	drzaveFile.Close()
 	oiFile.Close()
