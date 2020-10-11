@@ -166,12 +166,16 @@ func main() {
 	}
 
 	for key, value := range slovarDrzav {
+
+		// key = kratica drzave, value = stevilo tekmovalcev iz te drzave
 		v := int64(value)
 		d,_ := drzaveFile.WriteString("Iz drzave s kratico " + key + " je bilo " + strconv.FormatInt(v, 10) + " tekmovalcev. \n" )
+		// printanje d, da se program zazene
 		fmt.Println(d)
 	}
 
 	for key, value := range slovarDisciplinPrvaMesta {
+		// key = disciplina, value = slice od slice s podatki (disciplina, leto, mesto - prve tri - , rezultat)
 
 		v := int64(len(value))
 		dis,_ := oiFile.WriteString("Discipline " + key + " was on " + strconv.FormatInt(v, 10) + " olympic games. \n")
@@ -179,8 +183,10 @@ func main() {
 		//fmt.Println(key, value)
 		d := key
 
+		// Da niso presledki v imenu datoteke, sem jih zamenjala s podcrtaji
 		k := strings.Replace(key, " ", "_", -1)
 
+		// Za vsako disciplino, sem naredila novo tekstovno datoteko
 		disciplineFile, err4 := os.Create(fmt.Sprintf("poizvedbe/%s.txt", k))
 		if err4 != nil {
 			log.Fatal(err4)
@@ -202,33 +208,42 @@ func main() {
 			}
 		}
 		for key, value := range prvatrimesta{
-			sort.Slice(value, func(i, j int) bool {	return value[i][0] < value[j][0] })
 
-			fmt.Println(key, value)
+			// uredila slice po mestih (1., 2., 3.)
+			sort.Slice(value, func(i, j int) bool {	return value[i][0] < value[j][0] })
+			//fmt.Println(key, value)
 
 			if len(value) > 3 {
+				// Ce je blo vec tekmovalcev na tretjem mestu
 				if len(value[0]) != 2 || len(value[1]) != 2 || len(value[2]) != 2 || len(value[3]) != 2 {
+					// Ni podatkov, kaksen cas oziroma tocke so dosegli tekmovalci na zmagovalnem odru
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + ", " + value[2][0] + " " + value[2][1] + ", " + value[3][0] + " " + value[3][1] + "\n")
 					fmt.Println(disc, value)
 				}
 			} else if len(value) > 2 {
+				// Ce je bil na vsakem mestu samo en
 				if len(value[0]) != 2 || len(value[1]) != 2 || len(value[2]) != 2 {
+					// Ni podatkov, kaksen cas oziroma tocke so dosegli tekmovalci na zmagovalnem odru
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + ", " + value[2][0] + " " + value[2][1] + "\n")
 					fmt.Println(disc, value)
 				}
 			} else if len(value) > 1 {
+				// Ce so bli podatki samo za dva mesta
 				if len(value[0]) != 2 || len(value[1]) != 2 {
+					// Ni podatkov, kaksen cas oziroma tocke so dosegli tekmovalci na zmagovalnem odru
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + "\n")
 					fmt.Println(disc, value)
 				}
 			} else {
+				// Ce so bli podatki samo za eno mesto
 				if len(value[0]) != 2 {
+					// Ni podatkov, kaksen cas oziroma tocke so dosegli tekmovalci na zmagovalnem odru
 					continue
 				} else {
 					disc, _ := disciplineFile.WriteString(d + ", " + key + " " + value[0][0] + " " + value[0][1] + "\n")
@@ -236,8 +251,10 @@ func main() {
 				}
 			}
 		}
+		// Zaprla datoteko
 		disciplineFile.Close()
 	}
+	// Zaprla datoteki
 	drzaveFile.Close()
 	oiFile.Close()
 }
