@@ -1,0 +1,17 @@
+long jump women, 1956, 1. 6.35, 2. 6.09, 3. 6.07
+long jump women, 1972, 1. 6.78, 2. 6.77, 3. 6.67
+long jump women, 1964, 1. 6.76, 2. 6.60, 3. 6.42
+long jump women, 1988, 1. 7.40, 2. 7.22, 3. 7.11
+long jump women, 1960, 1. 6.37, 2. 6.27, 3. 6.21
+long jump women, 1996, 1. 7.12, 2. 7.02, 3. 7.00
+long jump women, 1980, 1. 7.06, 2. 7.04, 3. 7.01
+long jump women, 2000, 1. 6.99, 2. 6.92, 3. 6.83
+long jump women, 2008, 1. 7.04, 2. 6.91, 3. 6.79
+long jump women, 1976, 1. 6.72, 2. 6.66, 3. 6.60
+long jump women, 1948, 1. 5.695, 2. 5.600, 3. 5.575
+long jump women, 1984, 1. 6.96, 2. 6.81, 3. 6.80
+long jump women, 1968, 1. 6.82, 2. 6.68, 3. 6.66
+long jump women, 1992, 1. 7.14, 2. 7.12, 3. 7.07
+long jump women, 2016, 1. 7.17, 2. 6.95
+long jump women, 2012, 1. 7.12, 2. 7.07, 3. 6.89
+long jump women, 1952, 1. 6.24, 2. 6.14, 3. 5.92

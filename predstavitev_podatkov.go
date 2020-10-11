@@ -5,6 +5,9 @@ import(
 	"encoding/csv"
 	"os"
 	"log"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 // Tekmovalec je ...
@@ -87,9 +90,23 @@ func readCSV(filename string) ([][]string, error) {
 func main() {
 
 	// Odpre in prebere CSV datoteko
-	lines, err := readCSV("rezultati.csv")
-	if err != nil {
-		log.Fatal(err)
+	lines, err1 := readCSV("rezultati.csv")
+	if err1 != nil {
+		log.Fatal(err1)
+	}
+
+	// Odprla bom nekaj datotek in v njih zapisovala v for zanki
+
+	// Datoteka za drzave
+	drzaveFile, err2 := os.Create("poizvedbe/drzave.txt")
+	if err2 != nil {
+		log.Fatal(err2)
+	}
+
+	// Datoteka za stevilo olimpijskih iger pri vseh disciplinah
+	oiFile, err3 := os.Create("poizvedbe/oi.txt")
+	if err3 != nil {
+		log.Fatal(err3)
 	}
 
 	rezultati := make(map[string][]*Tekmovalec)
@@ -109,10 +126,118 @@ func main() {
 			rezultati[line[2]] = []*Tekmovalec{tekm}
 		}
 	}
-	//fmt.Println(rezultati)
 
+	// Slovarji s pomocjo katerih bom naredila nekaj poizvedb
+	slovarDisciplinPrvaMesta := make(map[string][][]string)
+	slovarDrzav := make(map[string]int)
+
+	
+	for _, value := range rezultati {
+
+		// Naredi slovar, kjer so kljuci krtaice drzav in vrednosti so stevila koliko razlicnih tekmovalcev prihaja iz te drzave.
+		if _,ok := slovarDrzav[value[0].drzava]; ok {
+			slovarDrzav[value[0].drzava] ++
+		} else {
+			slovarDrzav[value[0].drzava] = 1
+		}
+
+
+		for _, r := range value {
+		
+			oi := r.olimpijske[len(r.olimpijske)-4:]
+			mesto := r.mesto
+			rez := r.rezultat
+			sez := []string{oi, mesto, rez}
+
+
+			// Preveri, ce je disciplina ze v slovarju, sicer naredi nov kljuc discipline.
+			if _, ok := slovarDisciplinPrvaMesta[r.disciplina]; ok {
+				if mesto == "1." || mesto == "2." || mesto == "3." {
+					// Pri nekem kljucu doda tekmo v seznam, ce je bil tekmovalec prvi
+					slovarDisciplinPrvaMesta[r.disciplina] = append(slovarDisciplinPrvaMesta[r.disciplina], []string{oi, mesto, rez})
+				} 
+			} else {
+				if mesto == "1." || mesto == "2." || mesto == "3." {
+					// V slovarju ustvari kljuc z disciplino in prvo tekmo, ki jo najde v slovarju rezultati
+					slovarDisciplinPrvaMesta[r.disciplina] = [][]string{sez}
+				} 
+			}
+		}
+	}
+
+	for key, value := range slovarDrzav {
+		v := int64(value)
+		d,_ := drzaveFile.WriteString("Iz drzave s kratico " + key + " je bilo " + strconv.FormatInt(v, 10) + " tekmovalcev. \n" )
+		fmt.Println(d)
+	}
+
+	for key, value := range slovarDisciplinPrvaMesta {
+
+		v := int64(len(value))
+		dis,_ := oiFile.WriteString("Discipline " + key + " was on " + strconv.FormatInt(v, 10) + " olympic games. \n")
+		fmt.Println(dis)
+		//fmt.Println(key, value)
+		d := key
+
+		k := strings.Replace(key, " ", "_", -1)
+
+		disciplineFile, err4 := os.Create(fmt.Sprintf("poizvedbe/%s.txt", k))
+		if err4 != nil {
+			log.Fatal(err4)
+		}
+
+		prvatrimesta := make(map[string][][]string)
+
+		for _, i := range value {
+
+			l := i[0]
+			m := i[1]
+			r := i[2]
+			s := []string{m, r}
+			
+			if _,ok := prvatrimesta[l]; ok {
+				prvatrimesta[l] = append(prvatrimesta[l], []string{m, r})
+			} else {
+				prvatrimesta[l] = [][]string{s}
+			}
+		}
+		for key, value := range prvatrimesta{
+			sort.Slice(value, func(i, j int) bool {	return value[i][0] < value[j][0] })
+
+			fmt.Println(key, value)
+
+			if len(value) > 3 {
+				if len(value[0]) != 2 || len(value[1]) != 2 || len(value[2]) != 2 || len(value[3]) != 2 {
+					continue
+				} else {
+					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + ", " + value[2][0] + " " + value[2][1] + ", " + value[3][0] + " " + value[3][1] + "\n")
+					fmt.Println(disc, value)
+				}
+			} else if len(value) > 2 {
+				if len(value[0]) != 2 || len(value[1]) != 2 || len(value[2]) != 2 {
+					continue
+				} else {
+					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + ", " + value[2][0] + " " + value[2][1] + "\n")
+					fmt.Println(disc, value)
+				}
+			} else if len(value) > 1 {
+				if len(value[0]) != 2 || len(value[1]) != 2 {
+					continue
+				} else {
+					disc, _ := disciplineFile.WriteString(d + ", " + key + ", " + value[0][0] + " " + value[0][1] + ", " + value[1][0] + " " + value[1][1] + "\n")
+					fmt.Println(disc, value)
+				}
+			} else {
+				if len(value[0]) != 2 {
+					continue
+				} else {
+					disc, _ := disciplineFile.WriteString(d + ", " + key + " " + value[0][0] + " " + value[0][1] + "\n")
+					fmt.Println(disc, value)
+				}
+			}
+		}
+		disciplineFile.Close()
+	}
+	drzaveFile.Close()
+	oiFile.Close()
 }
-
-
-
-
